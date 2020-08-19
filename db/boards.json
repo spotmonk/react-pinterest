@@ -1,0 +1,17 @@
+{
+  "board1": {
+    "description":"Memes and stuff",
+    "name": "Memes",
+    "uid": "o48WKX06jmMqAmXfCi3AhpJ6emm2"
+  },
+  "board2": {
+    "description":"Anime",
+    "name": "Anime",
+    "uid": "o48WKX06jmMqAmXfCi3AhpJ6emm2"
+  },
+  "board3": {
+    "description":"Board Games ",
+    "name": "Board Games",
+    "uid": "o48WKX06jmMqAmXfCi3AhpJ6emm2"
+  }
+}

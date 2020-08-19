@@ -19,7 +19,7 @@ class MyNavBar extends React.Component {
   // log out on click
   logOutEvent = (e) => {
     e.preventDefault();
-    firebase.auth().signOut()
+    firebase.auth().signOut();
   }
 
   render() {
