@@ -6,6 +6,7 @@ import Auth from '../components/Auth/Auth';
 import BoardContainer from '../components/BoardContainer/BoardContainer';
 import MyNavbar from '../components/MyNavBar/MyNavBar';
 import fbConnection from '../helpers/data/connection';
+import SingleBoard from '../components/SingleBoard/SingleBoard';
 
 import './App.scss';
 
@@ -14,6 +15,7 @@ fbConnection();
 class App extends React.Component {
   state = {
     authed: false,
+    singleBoardId: '',
   }
 
   componentDidMount() {
@@ -30,10 +32,15 @@ class App extends React.Component {
     this.removeListener();
   }
 
+  setSingleBoard = (singleBoardId) => {
+    this.setState({ singleBoardId });
+  }
+
   render() {
-    const { authed } = this.state;
+    const { authed, singleBoardId } = this.state;
     const loadComponent = () => {
-      if (authed) { return <BoardContainer />; }
+      if (authed && singleBoardId.length === 0) { return <BoardContainer setSingleBoard={this.setSingleBoard} />; }
+      if (authed && singleBoardId.length > 0) { return <SingleBoard boardId={singleBoardId} setSingleBoard={this.setSingleBoard}/>; }
       return <Auth/>;
     };
 
