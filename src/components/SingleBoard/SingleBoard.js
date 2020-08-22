@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import boardsData from '../../helpers/data/boardsData';
-import PinData from '../../helpers/data/pinData';
+import pinData from '../../helpers/data/pinData';
 
 import Pin from '../Pin/Pin';
 
@@ -17,14 +17,26 @@ class SingleBoard extends React.Component {
     pins: [],
   }
 
+  goGetPins = () => {
+    const { boardId } = this.props;
+
+    pinData.getPinsByBoardId(boardId)
+      .then((pins) => this.setState({ pins }))
+      .catch((err) => console.error('get pins failed', err));
+  }
+
   componentDidMount() {
     const { boardId } = this.props;
     boardsData.getSingleBoard(boardId)
       .then((response) => this.setState({ board: response.data }))
       .catch((err) => console.error('get single board failed', err));
 
-    PinData.getPinsByBoardId(boardId)
-      .then((pins) => this.setState({ pins }))
+    this.goGetPins();
+  }
+
+  deletePin = (pinId) => {
+    pinData.deletePin(pinId)
+      .then(() => this.goGetPins())
       .catch((err) => console.error('get pins failed', err));
   }
 
@@ -32,7 +44,7 @@ class SingleBoard extends React.Component {
     const { board, pins } = this.state;
     const { setSingleBoard } = this.props;
 
-    const pinCards = pins.map((pin) => <Pin key={pin.id} pin={pin} />);
+    const pinCards = pins.map((pin) => <Pin key={pin.id} pin={pin} deletePin={this.deletePin} />);
 
     return (
       <div>
