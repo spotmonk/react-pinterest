@@ -5,6 +5,7 @@ import boardsData from '../../helpers/data/boardsData';
 import authData from '../../helpers/data/authData';
 
 import Board from '../../Board/Board';
+import BoardForm from '../BoardForm/BoardForm';
 import smash from '../../helpers/data/smash';
 
 class BoardContainer extends React.Component {
@@ -14,6 +15,7 @@ class BoardContainer extends React.Component {
 
   state = {
     boards: [],
+    formOpen: false,
   }
 
   getBoards = () => {
@@ -32,14 +34,27 @@ class BoardContainer extends React.Component {
       .catch((err) => console.error('get pins failed', err));
   }
 
+  createBoard = (newBoard) => {
+    boardsData.addBoard(newBoard)
+      .then(() => {
+        this.getBoards();
+        this.setState({ formOpen: false });
+      })
+      .catch((err) => console.error('Create Board Broke', err));
+  }
+
   render() {
-    const { boards } = this.state;
+    const { boards, formOpen } = this.state;
     const { setSingleBoard } = this.props;
     const boardCard = boards.map((board) => <Board key={board.id} board={board} setSingleBoard={setSingleBoard} deleteBoardAndPins={this.deleteBoardAndPins} />);
 
     return (
-      <div className="card-columns">
-        {boardCard}
+      <div>
+        <button className="btn btn-warning" onClick={ () => { this.setState({ formOpen: !formOpen }); }}>Add Board</button>
+        {formOpen ? <BoardForm createBoard={this.createBoard} /> : ''}
+        <div className="card-columns">
+          {boardCard}
+        </div>
       </div>
     );
   }

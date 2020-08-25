@@ -5,6 +5,7 @@ import boardsData from '../../helpers/data/boardsData';
 import pinData from '../../helpers/data/pinData';
 
 import Pin from '../Pin/Pin';
+import PinForm from '../PinForm/PinForm';
 
 class SingleBoard extends React.Component {
   static propTypes = {
@@ -15,6 +16,7 @@ class SingleBoard extends React.Component {
   state = {
     board: {},
     pins: [],
+    formOpen: false,
   }
 
   goGetPins = () => {
@@ -40,15 +42,26 @@ class SingleBoard extends React.Component {
       .catch((err) => console.error('get pins failed', err));
   }
 
+  addPin = (pinObj) => {
+    pinData.addPin(pinObj)
+      .then(() => {
+        this.goGetPins();
+        this.setState({ formOpen: false });
+      })
+      .catch((err) => console.error('Create Pin Broke', err));
+  }
+
   render() {
-    const { board, pins } = this.state;
-    const { setSingleBoard } = this.props;
+    const { board, pins, formOpen } = this.state;
+    const { boardId, setSingleBoard } = this.props;
 
     const pinCards = pins.map((pin) => <Pin key={pin.id} pin={pin} deletePin={this.deletePin} />);
 
     return (
       <div>
         <h4>{board.name}</h4>
+        <button className="btn btn-warning" onClick={ () => { this.setState({ formOpen: !formOpen }); }}>Add Pin</button>
+        {formOpen ? <PinForm boardId={boardId} addPin={this.addPin}/> : ''}
         {pinCards}
         <button className="btn btn-danger" onClick={() => { setSingleBoard(''); }}>X</button>
       </div>
