@@ -6,6 +6,7 @@ import authData from '../../helpers/data/authData';
 
 import Board from '../../Board/Board';
 import BoardForm from '../BoardForm/BoardForm';
+import smash from '../../helpers/data/smash';
 
 class BoardContainer extends React.Component {
   static propTypes = {
@@ -17,27 +18,40 @@ class BoardContainer extends React.Component {
     formOpen: false,
   }
 
-  componentDidMount() {
+  getBoards = () => {
     boardsData.getBoardsByUid(authData.getUid())
       .then((boards) => this.setState({ boards }))
       .catch((err) => console.error('get boards broke', err));
   }
 
-  createBoard = (newBaord) => {
-    boardsData.addBoard()
-      .then( this.get)
-      .catch((err) => console.warn('get board broke', err));
+  componentDidMount() {
+    this.getBoards();
+  }
+
+  deleteBoardAndPins = (boardId) => {
+    smash.deletePinsByBoard(boardId)
+      .then(() => this.getBoards())
+      .catch((err) => console.error('get pins failed', err));
+  }
+
+  createBoard = (newBoard) => {
+    boardsData.addBoard(newBoard)
+      .then(() => {
+        this.getBoards();
+        this.setState({ formOpen: false });
+      })
+      .catch((err) => console.error('Create Board Broke', err));
   }
 
   render() {
     const { boards, formOpen } = this.state;
     const { setSingleBoard } = this.props;
-    const boardCard = boards.map((board) => <Board key={board.id} board={board} setSingleBoard={setSingleBoard} />);
+    const boardCard = boards.map((board) => <Board key={board.id} board={board} setSingleBoard={setSingleBoard} deleteBoardAndPins={this.deleteBoardAndPins} />);
 
     return (
       <div>
         <button className="btn btn-warning" onClick={ () => { this.setState({ formOpen: !formOpen }); }}>Add Board</button>
-        {formOpen ? <BoardForm /> : ''}
+        {formOpen ? <BoardForm createBoard={this.createBoard} /> : ''}
         <div className="card-columns">
           {boardCard}
         </div>

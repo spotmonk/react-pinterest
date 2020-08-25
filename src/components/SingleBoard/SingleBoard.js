@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import boardsData from '../../helpers/data/boardsData';
-import PinData from '../../helpers/data/pinData';
+import pinData from '../../helpers/data/pinData';
 
 import Pin from '../Pin/Pin';
+import PinForm from '../PinForm/PinForm';
 
 class SingleBoard extends React.Component {
   static propTypes = {
@@ -15,6 +16,15 @@ class SingleBoard extends React.Component {
   state = {
     board: {},
     pins: [],
+    formOpen: false,
+  }
+
+  goGetPins = () => {
+    const { boardId } = this.props;
+
+    pinData.getPinsByBoardId(boardId)
+      .then((pins) => this.setState({ pins }))
+      .catch((err) => console.error('get pins failed', err));
   }
 
   componentDidMount() {
@@ -23,20 +33,35 @@ class SingleBoard extends React.Component {
       .then((response) => this.setState({ board: response.data }))
       .catch((err) => console.error('get single board failed', err));
 
-    PinData.getPinsByBoardId(boardId)
-      .then((pins) => this.setState({ pins }))
+    this.goGetPins();
+  }
+
+  deletePin = (pinId) => {
+    pinData.deletePin(pinId)
+      .then(() => this.goGetPins())
       .catch((err) => console.error('get pins failed', err));
   }
 
-  render() {
-    const { board, pins } = this.state;
-    const { setSingleBoard } = this.props;
+  addPin = (pinObj) => {
+    pinData.addPin(pinObj)
+      .then(() => {
+        this.goGetPins();
+        this.setState({ formOpen: false });
+      })
+      .catch((err) => console.error('Create Pin Broke', err));
+  }
 
-    const pinCards = pins.map((pin) => <Pin key={pin.id} pin={pin} />);
+  render() {
+    const { board, pins, formOpen } = this.state;
+    const { boardId, setSingleBoard } = this.props;
+
+    const pinCards = pins.map((pin) => <Pin key={pin.id} pin={pin} deletePin={this.deletePin} />);
 
     return (
       <div>
         <h4>{board.name}</h4>
+        <button className="btn btn-warning" onClick={ () => { this.setState({ formOpen: !formOpen }); }}>Add Pin</button>
+        {formOpen ? <PinForm boardId={boardId} addPin={this.addPin}/> : ''}
         {pinCards}
         <button className="btn btn-danger" onClick={() => { setSingleBoard(''); }}>X</button>
       </div>
