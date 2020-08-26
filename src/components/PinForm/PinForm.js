@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import authData from '../../helpers/data/authData';
 
 const PinForm = (props) => {
   const [pinName, setPinTitle] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   const pinTitleEvent = (e) => {
     e.preventDefault();
@@ -17,15 +18,25 @@ const PinForm = (props) => {
 
   const savePinEvent = (e) => {
     e.preventDefault();
-    console.warn(props);
     const newPin = {
       boardId: props.boardId,
       imageUrl,
       title: pinName,
       uid: authData.getUid(),
     };
-    props.addPin(newPin);
+    if (isEditing) {
+      props.putPin(props.pinToEdit.id, newPin);
+    } else {
+      props.addPin(newPin);
+    }
   };
+  useEffect(() => {
+    if (props.pinToEdit.title) {
+      setPinTitle(props.pinToEdit.title);
+      setImageUrl(props.pinToEdit.imageUrl);
+      setIsEditing(true);
+    }
+  }, []);
 
   return (
     <div>
@@ -39,7 +50,7 @@ const PinForm = (props) => {
             <label htmlFor="imageUrl">Image URL</label>
             <input type="text" className="form-control" id="imageUrl" onChange={imageUrlEvent} placeholder={imageUrl} />
           </div>
-          <button className="btn btn-primary" onClick={savePinEvent}>Save Pin</button>
+          <button className="btn btn-primary" onClick={savePinEvent}>{isEditing ? 'Edit' : 'Create'} Pin</button>
         </form>
       </div>
     </div>
