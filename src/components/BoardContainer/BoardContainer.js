@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import boardsData from '../../helpers/data/boardsData';
 import authData from '../../helpers/data/authData';
 
-import Board from '../../Board/Board';
+import Board from '../Board/Board';
 import BoardForm from '../BoardForm/BoardForm';
 import smash from '../../helpers/data/smash';
 
